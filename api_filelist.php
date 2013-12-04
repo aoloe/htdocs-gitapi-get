@@ -18,45 +18,11 @@
  *   (GET or POST).
  */
 
-function debug($label, $value) {
-    echo("<p>$label<br /><pre>".htmlentities(print_r($value, 1))."</pre></p>");
+if (!function_exists('debug')) {
+    function debug($label, $value) {
+        echo("<p>$label<br /><pre>".htmlentities(print_r($value, 1))."</pre></p>");
+    }
 }
-
-if (!defined('GITAPIGET_FILELIST_CONFIG_FILE')) {
-    define('GITAPIGET_FILELIST_CONFIG_FILE', 'config.json');
-}
-
-if (file_exists(GITAPIGET_FILELIST_CONFIG_FILE)) {
-    $config = json_decode(file_get_contents(GITAPIGET_FILELIST_CONFIG_FILE), true);
-    // debug('config', $config);
-} else {
-    debug('could not find the config file', GITAPIGET_FILELIST_CONFIG_FILE);
-}
-
-$hash = array_key_exists('hash', $_REQUEST) ? $_REQUEST['hash'] : '';
-
-$path_repository = null;
-
-if (array_key_exists($hash, $config['repository']) && array_key_exists('path', $config['repository'][$hash])) {
-    $path_repository = rtrim($config['repository'][$hash]['path'], '/');
-}
-
-// phpinfo();
-
-$result = array (
-    'sha' => 'gitapi-get',
-    'url' => 'http'.(strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === false ? '' : 's').'//'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'],
-    'tree' => array (
-        /*
-        array(
-        'type' => 'blob' | 'tree',
-        'sha' => '????', // 40 hex digit sha1 hash -> git hash-object filename; not needed for dirs
-        'path' => 'full/path/to/file.ext' |  'full/path/to/directory', 
-        'url' => '???',
-        )
-        */
-    ),
-);
 
 function sha1_git($filename) {
     // debug('filesize', filesize($filename));
@@ -67,55 +33,111 @@ function sha1_git($filename) {
 // debug('sha1_git', sha1_git('/home/ale/notes.txt'));
 
 
-function get_gitapiget_filelist($path) {
+function get_gitapiget_filelist_tree($path, $path_base = null) {
     $result = array();
+    // debug('path', $path);
+    if (is_null($path_base)) {
+        $path_base = $path;
+    }
+    $path_base_n = strlen($path_base) + 1;
     if ($handle = opendir($path)) {
         while (false !== ($filename = readdir($handle))) {
             // TODO: we may want to consider the .gitignore at the root
-            if ($filename != "." && $filename != ".." && $filename != ".git") {
                 // debug('filename', $filename);
                 $path_item = $path.'/'.$filename;
                 if (is_dir($path_item)) {
-                    $result[] = array(
-                        'type' => 'tree',
-                        'sha' => '',
-                        'path' => $path_item,
-                        'url' => '???',
-                    );
-                    if (is_readable($path_item)) {
-                        $result = array_merge($result, get_gitapiget_filelist($path_item));
+                    if ($filename != "." && $filename != ".." && $filename != ".git") {
+                        $result[] = array(
+                            'type' => 'tree',
+                            'sha' => '',
+                            'path' => substr($path_item, $path_base_n),
+                            'url' => '???',
+                        );
+                        if (is_readable($path_item)) {
+                            $result = array_merge($result, get_gitapiget_filelist_tree($path_item, $path_base));
+                        }
                     }
                 } elseif (is_file($path_item) && is_readable($path_item)) {
                     $result[] = array(
                         'type' => 'blob',
                         'sha' => sha1_git($path_item),
-                        'path' => $path_item,
+                        'path' => substr($path_item, $path_base_n),
                         'url' => '???',
                     );
                 }
             }
-        }
     }
     return $result;
-} // get_gitapiget_filelist()
+} // get_gitapiget_filelist_tree()
 
-// debug('path_repository', $path_repository);
-if (isset($path_repository) && ($path_repository != '') && file_exists($path_repository)) {
-    $result['tree'] = get_gitapiget_filelist($path_repository);
+/**
+ * Given an hash, checks for the related path in the config file and returns it.
+ * 
+ * Use this function if you want to serve different paths depending on an id  passed
+ * as an HTTP parameter: avoid using the HTTP parameter as parts of the paths!
+ */
+function get_gitapiget_filelist_path($hash = null) {
+    $result = null;
+
+    if (!defined('GITAPIGET_FILELIST_CONFIG_FILE')) {
+        define('GITAPIGET_FILELIST_CONFIG_FILE', 'config.json');
+    }
+
+    if (file_exists(GITAPIGET_FILELIST_CONFIG_FILE)) {
+        $config = json_decode(file_get_contents(GITAPIGET_FILELIST_CONFIG_FILE), true);
+        // debug('config', $config);
+    } else {
+        debug('could not find the config file', GITAPIGET_FILELIST_CONFIG_FILE);
+    }
+
+    if (is_null($hash)) {
+        $hash = array_key_exists('hash', $_REQUEST) ? $_REQUEST['hash'] : null;
+    }
+
+    if (isset($hash) && array_key_exists($hash, $config['repository']) && array_key_exists('path', $config['repository'][$hash])) {
+        $result = rtrim($config['repository'][$hash]['path'], '/');
+    }
+
+    // debug('result', $result);
+    return $result;
 }
 
-if ((ob_get_length() == 0) && !headers_sent()) {
-    header('Content-type: text/json');
-} else {
-    ob_flush();
-    // flush();
-    $file_wrote = '';
-    $line_wrote = '';
-    headers_sent($file_wrote, $line_wrote); // FIXME: returns the line where ob_flush is, not the output one
-    debug('haeders already sent', $file_wrote.' ['.$line_wrote.']');
-}
+function render_gitapiget_filelist($path) {
+    $result = array (
+        'sha' => 'gitapi-get',
+        'url' => 'http'.(strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === false ? '' : 's').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'],
+        'tree' => array (
+            /*
+            array(
+            'type' => 'blob' | 'tree',
+            'sha' => '????', // 40 hex digit sha1 hash -> git hash-object filename; not needed for dirs
+            'path' => 'full/path/to/file.ext' |  'full/path/to/directory', 
+            'url' => '???',
+            )
+            */
+        ),
+    );
+    // debug('path', $path);
+    if (isset($path) && ($path != '') && file_exists($path)) {
+        $result['tree'] = get_gitapiget_filelist_tree($path);
+    }
 
-echo(json_encode($result));
+    if ((ob_get_length() == 0) && !headers_sent()) {
+        header('Content-type: text/json');
+    } else {
+        ob_flush();
+        // flush();
+        $file_wrote = '';
+        $line_wrote = '';
+        headers_sent($file_wrote, $line_wrote); // FIXME: returns the line where ob_flush is, not the output one
+        debug('haeders already sent', $file_wrote.' ['.$line_wrote.']');
+    }
+    echo(json_encode($result));
+} // render_gitapiget_filelist()
+
+// phpinfo();
+
+
 
 /*
 {

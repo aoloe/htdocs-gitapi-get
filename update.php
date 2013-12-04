@@ -36,6 +36,25 @@ function get_gitapi_github_filelist_url($user, $repository, $branch = null) {
     );
 }
 
+function get_gitapi_self_filelist_url($hash) {
+    // debug('_SERVER', $_SERVER);
+    // TODO: use a constant for the api_filelist file name
+    // $result = 'http'.(strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === false ? '' : 's').'//'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'],
+    $result = 'http'.(strpos(strtolower($_SERVER['SERVER_PROTOCOL']), 'https') === false ? '' : 's').'://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['REQUEST_URI']).'/api_filelist.php?hash='.$hash;
+    // debug('result', $result);
+    return $result;
+    /*
+    return strtr(
+        'https://api.github.com/repos/$user/$repository/git/trees/$branch?recursive=1',
+        array(
+            '$user' => $user,
+            '$repository' => $repository,
+            '$branch' => isset($branch) ? $branch : 'master',
+        )
+    );
+    */
+}
+
 function get_gitapi_github_raw_url($user, $repository, $branch = null) {
     return strtr(
         'https://raw.github.com/$user/$repository/$branch/',
@@ -76,8 +95,10 @@ function get_gitapi_raw($url) {
  */
 function get_gitapi_list($url, $cache_id, $cache = null) {
     $result = array();
+    // debug('url', $url);
     $raw = get_gitapi_raw($url);
-    $list = json_decode($raw, $raw);
+    debug('raw', $raw);
+    $list = json_decode($raw, true);
     if (!isset($cache)) {
         $cache = get_gitapi_cache('gitapi/'.$cache_id.'/list.json');
     }
@@ -111,6 +132,7 @@ function get_gitapi_list($url, $cache_id, $cache = null) {
 function get_gitapi_tree($url, $cache_id, $cache = null) {
     $result = array();
     $list = get_gitapi_list($url, $cache_id, $cache);
+    debug('list', $list);
     foreach ($list as $item) {
         // debug('path', $item['path']);
         if ($item['type'] == 'tree') {
@@ -130,7 +152,11 @@ debug('rate_limit', $rate_limit);
 
 // get the list of the files on github, check their status against the cached list and "format" it
 // in a tree structure
-$tree = get_gitapi_tree(get_gitapi_github_filelist_url('aoloe', 'libregraphics-manual-scribus-development'), 'scribus-development');
+if (false) {
+    $tree = get_gitapi_tree(get_gitapi_github_filelist_url('aoloe', 'libregraphics-manual-scribus-development'), 'scribus-development');
+} else {
+    $tree = get_gitapi_tree(get_gitapi_self_filelist_url('lg_projects'), 'lg_projects');
+}
 
 $action = array();
 
