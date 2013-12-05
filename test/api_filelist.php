@@ -131,6 +131,42 @@ class TestOfAPIFiliset extends UnitTestCase {
         $this->assertIdentical($result, $expected);
     }
 
+    function testGetFilelistPathMatchesSwp() {
+
+        $expected = true;
+        $result = path_matches('test/.text.swp', '.*.swp');
+        // debug('result', $result);
+        // debug('expected', $expected);
+        $this->assertIdentical($result, $expected);
+    }
+
+    function testGetFilelistPathMatchesSwpInArray() {
+
+        $expected = true;
+        $result = path_matches('test/.text.swp', array('.*.swp', 'trust'));
+        // debug('result', $result);
+        // debug('expected', $expected);
+        $this->assertIdentical($result, $expected);
+    }
+
+    function testGetFilelistPathNotMatchesSwp() {
+
+        $expected = false;
+        $result = path_matches('test/.text', '.*.swp');
+        // debug('result', $result);
+        // debug('expected', $expected);
+        $this->assertIdentical($result, $expected);
+    }
+
+    function testGetFilelistPathNotMatchesSwpInArray() {
+
+        $expected = false;
+        $result = path_matches('test/.text', array('.*.swp', 'trust'));
+        // debug('result', $result);
+        // debug('expected', $expected);
+        $this->assertIdentical($result, $expected);
+    }
+
     function testGetFilelistTwoFilesGitignoreSwp() {
         $dir = dirname(__FILE__).'/api_filelist/twofilesgitignoreswp';
         $expected = array(
@@ -143,13 +179,13 @@ class TestOfAPIFiliset extends UnitTestCase {
             array (
                  'type' => 'blob',
                  'sha' => 'a01ee289f9a3c65287845c5138783d4f3b24a443',
-                 'path' => '.gitignore.txt',
+                 'path' => '.gitignore',
                  'url' => '???',
             ),
         );
         $result = get_gitapiget_filelist_tree($dir);
-        debug('result', $result);
-        debug('expected', $expected);
+        // debug('result', $result);
+        // debug('expected', $expected);
         $this->assertIdentical($result, $expected);
     }
 }

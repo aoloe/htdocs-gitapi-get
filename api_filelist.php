@@ -16,6 +16,7 @@
  * - The hash is a 40 hex digit sha1 hash built as sha1("blob " + filesize + "\0" + data).
  * - The available repositores are defined in the config.json file and can be queried with the hash parameter
  *   (GET or POST).
+ * - It tries to recognize and respect .gitignore files.
  */
 
 if (!function_exists('debug')) {
@@ -32,14 +33,57 @@ function sha1_git($filename) {
 // debug('sha1_file', sha1_file('/home/ale/notes.txt'));
 // debug('sha1_git', sha1_git('/home/ale/notes.txt'));
 
+/**
+ * @param array(<string>)/string $pattern if an array it's true if one of the strings matches.
+ * @return bool
+ */
+function path_matches($path, $pattern, $ignoreCase = false) {
 
-function get_gitapiget_filelist_tree($path, $path_base = null) {
+    if (is_array($pattern)) {
+        foreach ($pattern as $item) {
+            if (path_matches($path, $item, $ignoreCase)) {
+                return true;
+            }
+        }
+        return false;
+    } else {
+        $expr = preg_replace_callback(
+            '/[\\\\^$.[\\]|()?*+{}\\-\\/]/',
+            function($matches) {
+                switch ($matches[0]) {
+                    case '*':
+                        return '.*';
+                    case '?':
+                        return '.';
+                    default:
+                        return '\\'.$matches[0];
+                }
+            },
+            $pattern
+        );
+
+        $expr = '/'.$expr.'/';
+        if ($ignoreCase) {
+            $expr .= 'i';
+        }
+
+        return (bool) preg_match($expr, $path);
+    }
+
+} // path_matches()
+
+
+function get_gitapiget_filelist_tree($path, $path_base = null, $gitignore = null) {
     $result = array();
     // debug('path', $path);
     if (is_null($path_base)) {
         $path_base = $path;
     }
     $path_base_n = strlen($path_base) + 1;
+    if (file_exists($path.'/.gitignore')) {
+        $gitignore = array_filter(explode("\n", file_get_contents($path.'/.gitignore')));
+        // debug('gitignore', $gitignore);
+    }
     if ($handle = opendir($path)) {
         while (false !== ($filename = readdir($handle))) {
             // TODO: we may want to consider the .gitignore at the root
@@ -54,16 +98,21 @@ function get_gitapiget_filelist_tree($path, $path_base = null) {
                             'url' => '???',
                         );
                         if (is_readable($path_item)) {
-                            $result = array_merge($result, get_gitapiget_filelist_tree($path_item, $path_base));
+                            $result = array_merge($result, get_gitapiget_filelist_tree($path_item, $path_base, $gitignore));
                         }
                     }
                 } elseif (is_file($path_item) && is_readable($path_item)) {
-                    $result[] = array(
-                        'type' => 'blob',
-                        'sha' => sha1_git($path_item),
-                        'path' => substr($path_item, $path_base_n),
-                        'url' => '???',
-                    );
+                    $path_local = substr($path_item, $path_base_n);
+                    // debug('path_local', $path_local);
+                    // debug('path_matches', path_matches($path_local, $gitignore));
+                    if (!isset($gitignore) || !path_matches($path_local, $gitignore)) {
+                        $result[] = array(
+                            'type' => 'blob',
+                            'sha' => sha1_git($path_item),
+                            'path' => $path_local,
+                            'url' => '???',
+                        );
+                    }
                 }
             }
     }
