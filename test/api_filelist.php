@@ -8,22 +8,38 @@ if (!function_exists('debug')) {
 }
 
 class TestOfAPIFiliset extends UnitTestCase {
+    function ensureDirectory($dir) {
+        if (!file_exists($dir)) {
+            if (is_writable(dirname($dir))) {
+                    mkdir($dir);
+            } else {
+                $html = new HtmlReporter();
+                $html->paintFail(dirname($dir).' is not writable');
+                die();
+            }
+        }
+    }
     function testGetFilelistEmpty() {
         $expected = array();
+        $dir = dirname(__FILE__).'/api_filelist/empty';
+        $this->ensureDirectory($dir);
         // debug('file', __FILE__);
         // debug('dir', dirname(__FILE__));
-        $result = get_gitapiget_filelist_tree(dirname(__FILE__).'/api_filelist/empty');
+        $result = get_gitapiget_filelist_tree($dir);
         // debug('result', $result);
         // debug('expected', $expected);
         $this->assertIdentical($result, $expected);
     }
 
     function testGetFilelistOneDir() {
+        $dir = dirname(__FILE__).'/api_filelist/onedir';
+        $this->ensureDirectory($dir);
+        $this->ensureDirectory($dir.'/test');
         $expected = array(
             array (
                  'type' => 'tree',
                  'sha' => '',
-                 'path' => '/home/ale/docs/src/htdocs-gitapi-get/test/api_filelist/onedir/test',
+                 'path' => 'test',
                  'url' => '???',
             ),
         );
@@ -33,24 +49,28 @@ class TestOfAPIFiliset extends UnitTestCase {
         $this->assertIdentical($result, $expected);
     }
     function testGetFilelistTwoDirs() {
+        $dir = dirname(__FILE__).'/api_filelist/twodirs';
+        $this->ensureDirectory($dir);
+        $this->ensureDirectory($dir.'/retest');
+        $this->ensureDirectory($dir.'/test');
         $dir = 'twodirs';
         $expected = array(
             array (
                  'type' => 'tree',
                  'sha' => '',
-                 'path' => '/home/ale/docs/src/htdocs-gitapi-get/test/api_filelist/'.$dir.'/retest',
+                 'path' => $dir.'/retest',
                  'url' => '???',
             ),
             array (
                  'type' => 'tree',
                  'sha' => '',
-                 'path' => '/home/ale/docs/src/htdocs-gitapi-get/test/api_filelist/'.$dir.'/test',
+                 'path' => $dir.'/test',
                  'url' => '???',
             ),
         );
         $result = get_gitapiget_filelist_tree(dirname(__FILE__).'/api_filelist/'.$dir);
-        // debug('result', $result);
-        // debug('expected', $expected);
+        debug('result', $result);
+        debug('expected', $expected);
         $this->assertIdentical($result, $expected);
     }
 
