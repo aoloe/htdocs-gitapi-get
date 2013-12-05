@@ -97,7 +97,7 @@ function get_gitapi_list($url, $cache_id, $cache = null) {
     $result = array();
     // debug('url', $url);
     $raw = get_gitapi_raw($url);
-    debug('raw', $raw);
+    // debug('raw', $raw);
     $list = json_decode($raw, true);
     if (!isset($cache)) {
         $cache = get_gitapi_cache('gitapi/'.$cache_id.'/list.json');
@@ -132,7 +132,7 @@ function get_gitapi_list($url, $cache_id, $cache = null) {
 function get_gitapi_tree($url, $cache_id, $cache = null) {
     $result = array();
     $list = get_gitapi_list($url, $cache_id, $cache);
-    debug('list', $list);
+    // debug('list', $list);
     foreach ($list as $item) {
         // debug('path', $item['path']);
         if ($item['type'] == 'tree') {
@@ -142,7 +142,7 @@ function get_gitapi_tree($url, $cache_id, $cache = null) {
             set_gitapi_array_path($result, $item['path'], $item);
         }
     }
-    debug('result', $result);
+    // debug('result', $result);
     return $result;
 } // get_git_api_tree()
 
@@ -158,9 +158,11 @@ if (false) {
     $tree = get_gitapi_tree(get_gitapi_self_filelist_url('lg_projects'), 'lg_projects');
 }
 
+debug('tree', $tree);
+
 $action = array();
 
-function update_gitapi_cache($tre, &$action) {
+function update_gitapi_cache($tree, &$action) {
     foreach ($tree as $key => $value) {
         if (!array_key_exists('type', $value) || ($value['type'] == 'tree')) { // it's a file
         } else { // it's a directoy

@@ -140,6 +140,7 @@ function render_gitapiget_filelist($path) {
 
 
 /*
+ * sample for the return values from the github API. remove it as soon as "my" API is somehow stable
 {
     "sha":"master",
     "url":"https:\/\/api.github.com\/repos\/aoloe\/libregraphics-manual-libregraphics_for_ONGs\/git\/trees\/master",
