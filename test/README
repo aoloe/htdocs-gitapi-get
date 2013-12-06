@@ -1,1 +1,5 @@
 Download SimpleTest from http://www.simpletest.org/ and then launch index.php
+
+# TODO:
+
+- create a sample/ directory and put in there some samples for files that the user has to create to call the gitapi-get.
