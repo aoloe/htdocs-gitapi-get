@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Output a directoy listing compatible with the result of the Github API for the requests of the type:
+ * Output a directory listing compatible with the result of the Github API for the requests of the type:
  *
  * https://api.github.com/repos/$user/$repository/git/trees/master?recursive=1
  *
@@ -36,6 +36,8 @@ function sha1_git($filename) {
 /**
  * @param array(<string>)/string $pattern if an array it's true if one of the strings matches.
  * @return bool
+ *
+ * inspired by DaveRandom in http://stackoverflow.com/questions/13913796/php-glob-style-matching
  */
 function path_matches($path, $pattern, $ignoreCase = false) {
 

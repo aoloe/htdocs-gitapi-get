@@ -7,6 +7,7 @@ require_once('cache.php');
 class AllTests extends TestSuite {
     function __construct() {
         parent::__construct();
+        // $this->TestSuite('All tests');
         // $this->add(new TestOfSetTreePath());
         // $this->add(new TestOfAddTreePath());
     }

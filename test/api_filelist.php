@@ -8,7 +8,7 @@ if (!function_exists('debug')) {
 }
 
 class TestOfAPIFiliset extends UnitTestCase {
-    function ensureDirectory($dir) {
+    private function ensureDirectory($dir) {
         if (!file_exists($dir)) {
             if (is_writable(dirname($dir))) {
                     mkdir($dir);

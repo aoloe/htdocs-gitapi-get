@@ -81,7 +81,7 @@ function get_gitapi_cache($url, $base_path = null) {
     if (is_null($base_path)) {
         $base_path = GITAPIGET_CACHE_PATH;
     }
-    $file_name = $base_path.'/'.$url;
+    $file_name = $base_path.'/'.urlencode($url);
     if (file_exists($file_name)) {
         $result = file_get_contents($file_name);
     }
@@ -92,7 +92,7 @@ function put_gitapi_cache($url, $content, $base_path = null) {
     if (is_null($base_path)) {
         $base_path = GITAPIGET_CACHE_PATH;
     }
-    $file_name = $base_path.'/'.$url;
+    $file_name = $base_path.'/'.urlencode($url);
     // TODO: if file writable
     $result = file_put_contents($file_name, $content);
 } // put_gitapi_cache()
