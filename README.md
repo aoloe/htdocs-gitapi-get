@@ -16,3 +16,7 @@ There is no working code yet.
 
 # Configure
 
+
+# TODO
+
+- integrate the simplejson and mycurl for servers that don't have them enabled
