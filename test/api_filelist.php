@@ -7,7 +7,7 @@ if (!function_exists('debug')) {
     }
 }
 
-class TestOfAPIFiliset extends UnitTestCase {
+class TestOfAPIFilelist extends UnitTestCase {
     private function ensureDirectory($dir) {
         if (!file_exists($dir)) {
             if (is_writable(dirname($dir))) {
@@ -19,6 +19,7 @@ class TestOfAPIFiliset extends UnitTestCase {
             }
         }
     }
+
     function testGetFilelistEmpty() {
         $expected = array();
         $dir = dirname(__FILE__).'/api_filelist/empty';

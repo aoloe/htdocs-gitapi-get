@@ -1,4 +1,16 @@
 <?php
+/**
+ * Add items in a multi dimensional array by defining the path to the items.
+ * The array is created in a way that it makes it easy to further parse and to add custom properties.
+ *
+ * Each directory contains a counter with the number of the files contained.
+ *
+ * TODO:
+ * - implement the increment function as an optional parameter passed to the set function.
+ *
+ */
+
+define('GITAPIGET_TREEPATH_LIB', true);
 
 function get_gitapi_array_count_increment($value) {
     return (

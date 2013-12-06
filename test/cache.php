@@ -83,4 +83,23 @@ class TestOfCache extends UnitTestCase {
 
         unlink($dir.'/'.urlencode('content/test.txt'));
     }
+
+    function testPutCacheAddDelFile() {
+        $dir = dirname(__FILE__).'/cache/adddelfile';
+        $this->ensureDirectory($dir);
+        $content = 'this is a test content';
+        $expected = array(urlencode('content/test.txt'));
+        put_gitapi_cache('content/test.txt', $content, $dir);
+        $result = $this->ls($dir);
+        // debug('result', $result);
+        // debug('expected', $expected);
+        $this->assertIdentical($result, $expected);
+
+        $expected = array();
+        delete_gitapi_cache('content/test.txt', $content, $dir);
+        $result = $this->ls($dir);
+        // debug('result', $result);
+        // debug('expected', $expected);
+        $this->assertIdentical($result, $expected);
+    }
 }

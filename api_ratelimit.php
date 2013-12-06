@@ -16,8 +16,10 @@
  * - the reset option is not set.
  */
 
-function debug($label, $value) {
-    echo("<p>$label<br /><pre>".htmlentities(print_r($value, 1))."</pre></p>");
+if (!function_exists('debug')) {
+    function debug($label, $value) {
+        echo("<p>$label<br /><pre>".htmlentities(print_r($value, 1))."</pre></p>");
+    }
 }
 
 $result = array (
