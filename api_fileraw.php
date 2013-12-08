@@ -18,3 +18,15 @@ if (!function_exists('debug')) {
         echo("<p>$label<br /><pre>".htmlentities(print_r($value, 1))."</pre></p>");
     }
 }
+
+if (!defined('GITAPIGET_CACHE_LIB')) {
+    include_once(dirname(__FILE__).'/cache.php');
+}
+if (!defined('GITAPIGET_FILERAW_LIB')) {
+    include_once(dirname(__FILE__).'/fileraw.php');
+}
+
+$list = get_gitapi_cache('list.json', GITAPIGET_CACHE_PATH);
+// debug('list', $list);
+
+render_gitapi_fileraw(array_Key_exists('file', $_REQUEST) ? $_REQUEST['file'] : null);
