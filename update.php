@@ -83,7 +83,8 @@ if (ensure_gitapi_directory_writable('content', GITAPIGET_CACHE_PATH)) {
     $action = update_gitapi_cache(
         $list,
         GITAPIGET_CACHE_PATH.'/content',
-        GITAPIGET_LOCAL ? get_gitapi_self_raw_url() : get_gitapi_github_raw_url('aoloe', 'libregraphics-projects')
+        GITAPIGET_LOCAL ? get_gitapi_self_raw_url() : get_gitapi_github_raw_url('aoloe', 'libregraphics-projects'),
+        GITAPIGET_LOCAL
     );
     debug('action', $action);
 }

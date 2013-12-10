@@ -20,7 +20,7 @@ if (array_key_exists($hash, $config['repository']) && array_key_exists('path', $
     $path_repository = rtrim($config['repository'][$hash]['path'], '/');
 }
 */
-function get_gitapi_fileraw($filename) {
+function get_gitapi_fileraw($filename, $path = null, $list = null) {
     $result = null;
     // $path_file = $path_repository.'/'.$filename;
     $path_file = $filename;
@@ -36,7 +36,7 @@ function get_gitapi_fileraw($filename) {
 function render_gitapi_fileraw($filename, $list = null) {
     if (isset($filename)) {
         $result = get_gitapi_fileraw($filename);
-        If (isset($result)) {
+        if (isset($result)) {
             if ((ob_get_length() == 0) && !headers_sent()) {
                 // TODO: check for which extensions github returns different content types
                 header('Content-type: text/plain'); // .md .yaml
@@ -49,5 +49,6 @@ function render_gitapi_fileraw($filename, $list = null) {
                 debug('haeders already sent', $file_wrote.' ['.$line_wrote.']');
             }
         }
+        echo($result);
     }
 } // render_apiget_fileraw()

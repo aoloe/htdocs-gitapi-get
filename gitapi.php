@@ -79,12 +79,21 @@ function get_gitapi_list($url, $cache_id, $cache) {
             } else {
                 $item['status'] = 'new';
             }
+        } else {
+            unset($cache[$item['path']]); // remove the directories
+            unset($item);
         }
-        $result[$item['path']] = $item;
+        if (isset($item)) {
+            // debug('item', $item);
+            $result[$item['path']] = $item;
+        }
     }
     foreach ($cache as $item) {
-        $item['status'] = 'delete';
-        $result[$item['path']] = $item;
+        if ($item['status'] != 'delete') {
+            // debug('item', $item);
+            $item['status'] = 'delete';
+            $result[$item['path']] = $item;
+        }
     }
     // put_gitapi_cache('gitapi/'.$cache_id.'/list.json', encode_json($result));
     ksort($result);
@@ -114,6 +123,7 @@ function get_gitapi_tree($url, $cache_id, $cache = null) {
  */
 function get_gitapi_raw($url) {
     $result = '';
+    // debug('url', $url);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -149,18 +159,20 @@ function ensure_gitapi_cache($path_cache) {
  * - update modified files
  * - remove deleted files
  */
-function update_gitapi_cache($list, $path_cache, $url_raw) {
+function update_gitapi_cache($list, $path_cache, $url_raw, $use_get) {
     $result = array();
     foreach ($list as $key => $value) {
+        // debug('value', $value);
         if ($value['type'] == 'blob') { // it's a file
             // debug('value[path]', $value['path']);
             switch ($value['status']) {
                 case 'new' :
-                case 'modified' :
-                    put_gitapi_cache($value['path'], get_gitapi_raw($url_raw), $path_cache);
+                case 'update' :
+                    put_gitapi_cache($value['path'], get_gitapi_raw($url_raw.($use_get ? '?file=' : '/').$value['path']), $path_cache);
                     $result[$value['path']] = $value['status'];
                 break;
-                case 'deleted' :
+                case 'delete' :
+                    delete_gitapi_cache($value['path'], $path_cache);
                     $result[$value['path']] = $value['status'];
                 break;
             }
@@ -180,13 +192,14 @@ function update_gitapi_tree_cache($tree, $path_cache, $url_raw, &$action) {
                 update_gitapi_cache($value, $path_cache, $url_raw, $action);
             }
         } else { // it's a file
-            debug('value[path]', $value['path']);
+            // debug('value[path]', $value['path']);
             switch ($value['status']) {
                 case 'new' :
-                case 'modified' :
+                case 'update' :
                     put_gitapi_cache($value['path'], get_gitapi_raw($url_raw), $path_cache);
                 break;
-                case 'deleted' :
+                case 'delete' :
+                    delete_gitapi_cache($value['path'], $path_cache);
                 break;
             }
             $action[$value['path']] = $value['status'];

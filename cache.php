@@ -121,11 +121,12 @@ function get_gitapi_cache($url, $base_path = null) {
     return $result;
 } // get_gitapi_cache()
 
-function delete_gitapi_cache($url, $content, $base_path = null) {
+function delete_gitapi_cache($url, $base_path = null) {
     if (is_null($base_path)) {
         $base_path = GITAPIGET_CACHE_PATH;
     }
     $file_name = $base_path.'/'.urlencode($url);
+    // debug('file_name', $file_name);
     // TODO: if file writable
     $result = unlink($file_name);
 } // delete_gitapi_cache()

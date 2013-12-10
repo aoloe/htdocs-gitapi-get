@@ -29,4 +29,15 @@ if (!defined('GITAPIGET_FILERAW_LIB')) {
 $list = get_gitapi_cache('list.json', GITAPIGET_CACHE_PATH);
 // debug('list', $list);
 
-render_gitapi_fileraw(array_Key_exists('file', $_REQUEST) ? $_REQUEST['file'] : null);
+render_gitapi_fileraw(
+    array_Key_exists('file', $_REQUEST) ?
+    (
+        GITAPIGET_API_FILERAW_PATH.'/'.
+        (
+            defined('GITAPIGET_API_FILERAW_URLENCODE_PATH') && GITAPIGET_API_FILERAW_URLENCODE_PATH ?
+            urlencode($_REQUEST['file']) :
+            $_REQUEST['file']
+        )
+    ) :
+    null
+);
