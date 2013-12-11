@@ -68,7 +68,7 @@ function ensure_gitapi_directory_writable($path, $base_path = '') {
  * it must be a relative path starting from the current directory or from $base_path when defined.
  * @param string $path the part of the path where it should not create directories.
  */
-function ensure_file_writable($path, $base_path = '') {
+function ensure_gitapi_file_writable($path, $base_path = '') {
     $result = false;
     if ($base_path != '') {
         $base_path = rtrim($base_path, '/').'/';
@@ -81,24 +81,6 @@ function ensure_file_writable($path, $base_path = '') {
     }
     return $result;
 } // ensure_file_writable
-
-function put_cache($path, $content, $manual_id = null) {
-    $result = false;
-    $path_cache = (isset($manual_id) ? $manual_id.'/' : '').$path;
-    if (ensure_file_writable($path_cache, MANUAL_CACHE_PATH)) {
-        file_put_contents(MANUAL_CACHE_PATH.$path_cache, $content);
-    }
-    return $result;
-} // put_cache()
-
-function get_cache($path, $content, $manual_id = null) {
-    $result = false;
-    $path_cache = (isset($manual_id) ? $manual_id.'/' : '').$path;
-    if (ensure_file_writable($path_cache, MANUAL_CACHE_PATH)) {
-        file_put_contents(MANUAL_CACHE_PATH.$path_cache, $content);
-    }
-    return $result;
-} // put_cache()
 
 function put_gitapi_cache($url, $content, $base_path = null) {
     if (is_null($base_path)) {
