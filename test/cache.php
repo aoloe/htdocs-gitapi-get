@@ -96,7 +96,7 @@ class TestOfCache extends UnitTestCase {
         $this->assertIdentical($result, $expected);
 
         $expected = array();
-        delete_gitapi_cache('content/test.txt', $content, $dir);
+        delete_gitapi_cache('content/test.txt', $dir);
         $result = $this->ls($dir);
         // debug('result', $result);
         // debug('expected', $expected);
