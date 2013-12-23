@@ -14,10 +14,6 @@ if (!function_exists('debug')) {
     }
 }
 
-if (!defined('GITAPIGET_TREEPATH_LIB')) {
-    include_once('treepath.php');
-}
-
 if (!defined('GITAPIGET_CACHE_LIB')) {
     include_once(dirname(__FILE__).'/cache.php');
 }

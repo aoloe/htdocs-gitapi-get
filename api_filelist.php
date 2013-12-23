@@ -14,8 +14,6 @@
  * - This is useful to test the script without quering Github.
  * - This version directly queries the local filesystem.
  * - The hash is a 40 hex digit sha1 hash built as sha1("blob " + filesize + "\0" + data).
- * - The available repositores are defined in the config.json file and can be queried with the hash parameter
- *   (GET or POST).
  * - It tries to recognize and respect .gitignore files.
  */
 
@@ -120,38 +118,6 @@ function get_gitapiget_filelist_tree($path, $path_base = null, $gitignore = null
     }
     return $result;
 } // get_gitapiget_filelist_tree()
-
-/**
- * Given an hash, checks for the related path in the config file and returns it.
- * 
- * Use this function if you want to serve different paths depending on an id  passed
- * as an HTTP parameter: avoid using the HTTP parameter as parts of the paths!
- */
-function get_gitapiget_filelist_path($hash = null) {
-    $result = null;
-
-    if (!defined('GITAPIGET_FILELIST_CONFIG_FILE')) {
-        define('GITAPIGET_FILELIST_CONFIG_FILE', 'config.json');
-    }
-
-    if (file_exists(GITAPIGET_FILELIST_CONFIG_FILE)) {
-        $config = json_decode(file_get_contents(GITAPIGET_FILELIST_CONFIG_FILE), true);
-        // debug('config', $config);
-    } else {
-        debug('could not find the config file', GITAPIGET_FILELIST_CONFIG_FILE);
-    }
-
-    if (is_null($hash)) {
-        $hash = array_key_exists('hash', $_REQUEST) ? $_REQUEST['hash'] : null;
-    }
-
-    if (isset($hash) && array_key_exists($hash, $config['repository']) && array_key_exists('path', $config['repository'][$hash])) {
-        $result = rtrim($config['repository'][$hash]['path'], '/');
-    }
-
-    // debug('result', $result);
-    return $result;
-}
 
 function render_gitapiget_filelist($path) {
     $result = array (
