@@ -27,7 +27,7 @@ If you want to serve files from a local directory create the `api_fileraw.php` f
     // define('GITAPIGET_API_FILERAW_URLENCODE_PATH', true);
     include('engine/api_fileraw.php');
 
-If you want to have a counter for the hits coming from a specific IP address create the `api_fileraw.php` file
+If you want to have a counter for the hits coming from a specific IP address create the `api_ratelimit.php` file
 
     <?php
     include('engine/api_ratelimit.php');
