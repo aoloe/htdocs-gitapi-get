@@ -64,13 +64,17 @@ function get_gitapi_self_raw_url($hash = null) {
  * @param string $cache_id
  * @param array $cache
  */
-function get_gitapi_list($url, $cache_id, $cache) {
+function get_gitapi_list($url) {
     $result = array();
     // debug('url', $url);
     $raw = get_gitapi_raw($url);
     // debug('raw', $raw);
-    $list = json_decode($raw, true);
+    $result = json_decode($raw, true);
+    return $result;
+} // get_gitapi_list()
 
+function get_gitapi_compared_list($list, $cache) {
+    $result = array();
     foreach ($list['tree'] as $item) {
         if ($item['type'] == 'blob') {
             if (array_key_exists($item['path'], $cache)) {
@@ -95,15 +99,15 @@ function get_gitapi_list($url, $cache_id, $cache) {
             $result[$item['path']] = $item;
         }
     }
-    // put_gitapi_cache('gitapi/'.$cache_id.'/list.json', encode_json($result));
     ksort($result);
     // debug('result', $result);
     return $result;
-} // get_gitapi_list()
+}
 
-function get_gitapi_tree($url, $cache_id, $cache = null) {
+function get_gitapi_tree($url, $cache = null) {
     $result = array();
-    $list = get_gitapi_list($url, $cache_id, $cache);
+    $list = get_gitapi_list($url, $cache);
+    $list = get_gitapi_compared_list($list, $cache);
     // debug('list', $list);
     foreach ($list as $item) {
         // debug('path', $item['path']);

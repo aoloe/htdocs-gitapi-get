@@ -37,8 +37,8 @@ if ($rate_limit['resources']['core']['remaining'] == 0) {
 
 // get the list of the files on github, check their status against the cached list
 // TODO: if force don't read the json cache
-$list = get_gitapi_cache('list.json', GITAPIGET_CACHE_PATH);
-$list = ($list != '' ? json_decode($list, true) : array());
+$cache = get_gitapi_cache('list.json', GITAPIGET_CACHE_PATH);
+$cache = ($cache != '' ? json_decode($cache, true) : array());
 // debug('list', $list);
 
 $list = get_gitapi_list(
@@ -46,10 +46,9 @@ $list = get_gitapi_list(
         GITAPIGET_LOCAL ?
         get_gitapi_self_filelist_url('lg_projects') :
         get_gitapi_github_filelist_url('aoloe', 'libregraphics-projects')
-    ),
-    'lg_projects',
-    $list
+    )
 ); 
+$list = get_gitapi_compared_list($list, $cache);
 
 // debug('list', $list);
 
