@@ -13,6 +13,7 @@ class GitApiGet {
     public function __construct($config = null) {
         $this->config = $config;
         // debug('config', $this->config);
+        // ensure_gitapi_directory_writable($this->config['cache.path']);
     }
 
     public function get_ratelimit() {
@@ -24,25 +25,32 @@ class GitApiGet {
     }
 
     public function get_list_from_cache() {
-        $cache = get_gitapi_cache('list.json', $this->config['cache']);
+        $cache = get_gitapi_cache('list.json', $this->config['cache.path']);
         $list = ($cache != '' ? json_decode($cache, true) : array());
-        debug('list', $list);
+        // debug('list', $list);
+        return $list;
+    }
+
+    public function set_list_into_cache($list) {
+        put_gitapi_cache('list.json', json_encode($list), $this->config['cache.path']);
         return $list;
     }
 
     public function get_list() {
         $url = strtr(
             $this->config['url.filelist'],
+            // TODO: find a way to show different repositories (forks) and branches
             array(
-                '$user' => $user,
-                '$repository' => $repository,
-                '$branch' => isset($branch) ? $branch : 'master',
+                '$user' => $this->config['repository.user'],
+                '$repository' => $this->config['repository.repository'],
+                '$branch' => $this->config['repository.branch'],
             )
         );
-        return get_gitapi_list($url, $cache);
+        // debug('url', $url);
+        return get_gitapi_list($url);
     }
 
-    public function get_compared_list($list, $cache) {
+    public function get_list_compared($list, $cache) {
         return get_gitapi_compared_list($list, $cache);
     }
 
@@ -59,7 +67,7 @@ class GitApiGet {
     public function ensure_cache($path_cache) {
         ensure_gitapi_cache($path_cache);
     }
-    public function update_cache($list, $path_cache, $url_raw, $use_get) {
-        return update_gitapi_cache($list, $path_cache, $url_raw, $use_get);
+    public function update_cache($list) {
+        return update_gitapi_cache($list, $this->config['cache.path'], $this->config['url.fileraw'], array_key_exists('url.method', $this->config) && $this->config['url.method'] == 'get');
     }
 }

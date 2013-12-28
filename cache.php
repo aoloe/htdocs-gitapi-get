@@ -30,7 +30,7 @@ function ensure_gitapi_directory_writable($path, $base_path = '') {
     if (file_exists($base_path.$path)) {
         $result = is_dir($base_path.$path) && is_writable($base_path.$path);
     } else {
-        if (!file_exists($base_path)) {
+        if (($base_path != '') && !file_exists($base_path)) {
             if (is_writable(dirname($base_path))) {
                 mkdir($base_path);
             } else {

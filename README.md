@@ -16,8 +16,7 @@ If you want to serve a list of files in a local directory create the `api_fileli
 
     <?php
     include('engine/api_filelist.php');
-    define('GITAPIGET_FILELIST_CONFIG_FILE', dirname(__FILE__).'/config.json');
-    render_gitapiget_filelist(get_gitapiget_filelist_path());
+    render_gitapiget_filelist($path);
 
 If you want to serve files from a local directory create the `api_fileraw.php` file
 
