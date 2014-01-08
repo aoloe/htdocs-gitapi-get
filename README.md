@@ -16,15 +16,13 @@ If you want to serve a list of files in a local directory create the `api_fileli
 
     <?php
     include('engine/api_filelist.php');
-    render_gitapiget_filelist($path);
+    render_gitapiget_filelist('path/to/the_directory/');
 
 If you want to serve files from a local directory create the `api_fileraw.php` file
 
     <?php
-    define('GITAPIGET_CACHE_PATH', dirname(__FILE__).'/cache');
-    define('GITAPIGET_API_FILERAW_PATH', '/home/ale/docs/src/libregraphics-projects/');
-    // define('GITAPIGET_API_FILERAW_URLENCODE_PATH', true);
     include('engine/api_fileraw.php');
+    render_gitapiget_fileraw('path/to/the_directory/');
 
 If you want to have a counter for the hits coming from a specific IP address create the `api_ratelimit.php` file
 
