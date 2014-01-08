@@ -20,11 +20,8 @@ if (array_key_exists($hash, $config['repository']) && array_key_exists('path', $
     $path_repository = rtrim($config['repository'][$hash]['path'], '/');
 }
 */
-function get_gitapi_fileraw($filename, $path = null, $list = null) {
+function get_gitapi_fileraw($path_file) {
     $result = null;
-    // $path_file = $path_repository.'/'.$filename;
-    $path_file = $filename;
-
     if (file_exists($path_file) && is_file($path_file)) {
         $result = file_get_contents($path_file);
     } else {
@@ -33,7 +30,7 @@ function get_gitapi_fileraw($filename, $path = null, $list = null) {
     return $result;
 } // get_apiget_fileraw()
 
-function render_gitapi_fileraw($filename, $list = null) {
+function render_gitapi_fileraw($filename) {
     if (isset($filename)) {
         $result = get_gitapi_fileraw($filename);
         if (isset($result)) {
