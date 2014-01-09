@@ -127,7 +127,7 @@ function get_gitapi_tree($url, $cache = null) {
  */
 function get_gitapi_raw($url) {
     $result = '';
-    debug('url', $url);
+    // debug('url', $url);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_HEADER, 0);

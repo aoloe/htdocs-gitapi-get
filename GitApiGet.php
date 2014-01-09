@@ -2,7 +2,7 @@
 /**
  * Object oriented proxy to the gitapi library to be used in Slim
  */
-namespace Aoloe;
+// namespace Aoloe;
 
 require_once dirname(__FILE__).'/gitapi.php';
 require_once dirname(__FILE__).'/cache.php';
